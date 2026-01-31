@@ -76,7 +76,17 @@ export default function Room() {
         value={roomId}
         onChange={(e) => {
           setRoom(e.target.value);
-          setSavedOk(false); // ✅ 수정하면 다시 "저장 필요" 상태로
+          setSavedOk(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            save();
+          }
+        }}
+        onPaste={() => {
+          setSavedOk(false);
+          setTimeout(() => save(), 0);
         }}
         placeholder="예: room-abc123xyz789"
         style={{

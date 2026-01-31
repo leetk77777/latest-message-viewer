@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { getRoomId } from "./roomid";
 
-// Supabase client
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL as string,
   import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -11,14 +10,13 @@ const supabase = createClient(
 
 export default function Write() {
   const nav = useNavigate();
-
   const roomId = useMemo(() => getRoomId(), []);
+
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">(
     "idle"
   );
 
-  // roomId 없으면 room 설정 화면으로 이동
   useEffect(() => {
     if (!roomId) nav("/room");
   }, [roomId, nav]);
@@ -30,7 +28,6 @@ export default function Write() {
     try {
       setStatus("saving");
 
-      // room_id UNIQUE → upsert로 항상 1행 유지
       const { error } = await supabase
         .from("messages")
         .upsert(
@@ -40,7 +37,7 @@ export default function Write() {
 
       if (error) throw error;
 
-      setText("");
+      setText("");          // ✅ 저장 후 입력창 비우기
       setStatus("done");
     } catch (e) {
       console.error(e);
@@ -71,8 +68,19 @@ export default function Write() {
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+            // PC: Ctrl+Enter / Cmd+Enter 저장
+            e.preventDefault();
+            save();
+          }
+        }}
+        onPaste={() => {
+          // 📱 모바일: 붙여넣기 하면 자동 저장
+          setTimeout(() => save(), 0);
+        }}
         rows={6}
-        placeholder="메시지를 입력하세요"
+        placeholder="메시지를 붙여넣으면 자동 저장됩니다"
         style={{
           width: "100%",
           fontSize: 16,
@@ -109,7 +117,7 @@ export default function Write() {
       </div>
 
       <div style={{ marginTop: 10, fontSize: 13, opacity: 0.7 }}>
-        ※ 이 roomId에는 항상 “최신 메시지 1개”만 저장됩니다.
+        ※ 이 roomId에는 항상 최신 메시지 1개만 저장됩니다.
       </div>
     </div>
   );
