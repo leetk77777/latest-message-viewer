@@ -12,6 +12,7 @@ function makeRandomRoomId() {
 
 export default function Room() {
   const nav = useNavigate();
+<<<<<<< HEAD
   const initial = useMemo(() => getRoomId(), []);
   const [roomId, setRoom] = useState(initial);
 
@@ -24,6 +25,14 @@ export default function Room() {
       alert("roomId를 입력하세요.");
       return;
     }
+=======
+  const saved = useMemo(() => getRoomId(), []);
+  const [roomId, setRoom] = useState(saved);
+
+  function save() {
+    const v = roomId.trim();
+    if (!v) return;
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
 
     // 간단 검증(선택): 너무 짧으면 충돌 위험
     if (v.length < 6) {
@@ -32,17 +41,22 @@ export default function Room() {
     }
 
     setRoomId(v);
+<<<<<<< HEAD
 
     // ✅ 저장 확인 메시지 표시
     setSavedOk(true);
 
     // ❗ 이전처럼 바로 이동하고 싶으면 아래 한 줄을 다시 살리면 됩니다.
     // nav("/write");
+=======
+    nav("/write");
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
   }
 
   function reset() {
     clearRoomId();
     setRoom("");
+<<<<<<< HEAD
     setSavedOk(false);
   }
 
@@ -60,6 +74,8 @@ export default function Room() {
       return;
     }
     nav("/view");
+=======
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
   }
 
   return (
@@ -74,10 +90,14 @@ export default function Room() {
       </label>
       <input
         value={roomId}
+<<<<<<< HEAD
         onChange={(e) => {
           setRoom(e.target.value);
           setSavedOk(false); // ✅ 수정하면 다시 "저장 필요" 상태로
         }}
+=======
+        onChange={(e) => setRoom(e.target.value)}
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
         placeholder="예: room-abc123xyz789"
         style={{
           width: "100%",
@@ -100,6 +120,7 @@ export default function Room() {
             cursor: "pointer",
           }}
         >
+<<<<<<< HEAD
           저장
         </button>
 
@@ -108,6 +129,13 @@ export default function Room() {
             setRoom(makeRandomRoomId());
             setSavedOk(false);
           }}
+=======
+          저장하고 입력으로
+        </button>
+
+        <button
+          onClick={() => setRoom(makeRandomRoomId())}
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
           style={{
             padding: "12px 14px",
             fontSize: 14,
@@ -124,6 +152,7 @@ export default function Room() {
         현재 저장된 roomId: <b>{getRoomId() || "(없음)"}</b>
       </div>
 
+<<<<<<< HEAD
       {/* ✅ 저장 확인 메시지 + 이동 버튼 */}
       {savedOk && (
         <div
@@ -171,6 +200,11 @@ export default function Room() {
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <button
           onClick={goView}
+=======
+      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+        <button
+          onClick={() => nav("/view")}
+>>>>>>> 62d03d9bc76bc36ed5551a51a64c5aefe3709124
           style={{
             padding: "10px 12px",
             borderRadius: 10,
