@@ -174,7 +174,7 @@ export default function Room() {
 
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <button
-          onClick={() => nav("/view")}
+          onClick={view}
           style={{
             padding: "10px 12px",
             borderRadius: 10,
