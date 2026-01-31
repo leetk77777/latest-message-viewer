@@ -31,7 +31,7 @@ export default function Write() {
       const { error } = await supabase
         .from("messages")
         .upsert(
-          { room_id: roomId, text: message },
+          { room_id: roomId, content: message },
           { onConflict: "room_id" }
         );
 
