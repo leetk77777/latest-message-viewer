@@ -45,6 +45,16 @@ export default function Room() {
     setSavedOk(false);
   }
 
+  function view() {
+    const v = roomId.trim();
+    if (!v) {
+      alert("roomId를 입력하세요.");
+      return;
+    }
+
+    nav("/view");
+  }
+
   return (
     <div style={{ padding: 24, maxWidth: 520, margin: "0 auto" }}>
       <h2 style={{ marginBottom: 8 }}>Room ID 설정</h2>
@@ -147,7 +157,7 @@ export default function Room() {
               입력 화면으로
             </button>
             <button
-              onClick={() => nav("/view")}
+              onClick={view}
               style={{
                 flex: 1,
                 padding: "10px 12px",

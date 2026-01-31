@@ -41,8 +41,9 @@ export default function Write() {
 
       setText("");
       setStatus("done");
+
       // 원하면 저장 후 자동 이동:
-      // nav("/view");
+      nav("/view");
     } catch (e) {
       console.error("SAVE ERROR:", e);
       setStatus("error");
