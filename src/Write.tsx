@@ -40,7 +40,7 @@ export default function Write() {
       setText("");          // ✅ 저장 후 입력창 비우기
       setStatus("done");
     } catch (e) {
-      console.error(e);
+      console.error("SAVE ERROR:", e);
       setStatus("error");
     }
   }
