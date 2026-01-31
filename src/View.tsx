@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 import { getRoomId } from "./roomid";
@@ -20,50 +20,64 @@ function formatKST(iso: string) {
 
 export default function View() {
   const nav = useNavigate();
-  const roomId = getRoomId();
+  const roomId = useMemo(() => getRoomId(), []);
 
   const [msg, setMsg] = useState<Message | null>(null);
   const [status, setStatus] = useState<"ok" | "loading" | "error">("loading");
 
-  async function fetchLatest() {
+  const fetchLatest = useCallback(async () => {
     try {
-      setStatus("loading");
+      // ✅ OK 상태일 때는 굳이 loading으로 바꿔서 화면 깜빡이게 하지 않음
+      setStatus((prev) => (prev === "ok" ? "ok" : "loading"));
 
       const { data, error } = await supabase
         .from("messages")
         .select("room_id,text,created_at")
         .eq("room_id", roomId)
-        .single();
+        .maybeSingle(); // ✅ 없으면 data=null
 
-      // single()은 row가 없으면 error가 날 수 있어요.
       if (error) {
-        // 아직 저장된 메시지가 없는 경우도 있으니, 그때는 msg를 null로 처리
-        setMsg(null);
-        setStatus("ok");
+        console.error("FETCH ERROR:", error);
+        setStatus("error");
         return;
       }
 
-      setMsg(data);
+      setMsg(data ?? null);
       setStatus("ok");
     } catch (e) {
-      console.error(e);
+      console.error("FETCH EXCEPTION:", e);
       setStatus("error");
     }
-  }
+  }, [roomId]);
 
   useEffect(() => {
     if (!roomId) {
       nav("/room");
       return;
     }
-    fetchLatest();
+
+    // ✅ effect 본문에서 동기 setState를 피하기 위해 첫 호출을 콜백으로 감쌈
+    const first = window.setTimeout(() => {
+      fetchLatest();
+    }, 0);
+
     const t = window.setInterval(fetchLatest, 20000); // ✅ 20초
-    return () => window.clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId]);
+
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(t);
+    };
+  }, [roomId, nav, fetchLatest]);
 
   return (
-    <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "grid",
+        placeItems: "center",
+        padding: 24,
+      }}
+    >
       <div style={{ maxWidth: 900, width: "100%" }}>
         <div style={{ fontSize: 14, opacity: 0.75, marginBottom: 8 }}>
           최신 메시지 (20초 갱신) / roomId: <b>{roomId}</b>{" "}
@@ -72,6 +86,9 @@ export default function View() {
           </button>
           <button onClick={() => nav("/write")} style={{ marginLeft: 8 }}>
             입력하기
+          </button>
+          <button onClick={fetchLatest} style={{ marginLeft: 8 }}>
+            새로고침
           </button>
         </div>
 
@@ -82,14 +99,18 @@ export default function View() {
             padding: 24,
             fontSize: 28,
             lineHeight: 1.4,
+
+            // ✅ 줄바꿈/공백 그대로 표시
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
-            minHeight: 120,            
+
+            minHeight: 120,
           }}
         >
           {status === "loading" && "불러오는 중..."}
           {status === "error" && "오류가 발생했습니다. 콘솔을 확인하세요."}
-          {status === "ok" && (msg ? msg.text : "아직 메시지가 없습니다. /write에서 입력하세요.")}
+          {status === "ok" &&
+            (msg ? msg.text : "아직 메시지가 없습니다. /write에서 입력하세요.")}
         </div>
 
         <div style={{ marginTop: 10, fontSize: 13, opacity: 0.7 }}>

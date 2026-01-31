@@ -31,14 +31,24 @@ export default function Write() {
       const { error } = await supabase
         .from("messages")
         .upsert(
-          { room_id: roomId, content: message },
-          { onConflict: "room_id" }
+          {
+            room_id: roomId,
+            text: message, // ✅ DB 컬럼명과 일치
+            created_at: new Date().toISOString(), // ✅ 최신 저장 시각
+          },
+          {
+            onConflict: "room_id", // ✅ room_id PK 기준 덮어쓰기
+          }
         );
 
       if (error) throw error;
 
-      setText("");          // ✅ 저장 후 입력창 비우기
+      setText("");       // 입력창 비우기
       setStatus("done");
+
+      // 원하면 자동으로 보기 화면 이동
+      // nav("/view");
+
     } catch (e) {
       console.error("SAVE ERROR:", e);
       setStatus("error");
@@ -51,12 +61,14 @@ export default function Write() {
 
       <div style={{ fontSize: 14, opacity: 0.75, marginBottom: 14 }}>
         roomId: <b>{roomId}</b>
+
         <button
           onClick={() => nav("/room")}
           style={{ marginLeft: 10, padding: "6px 10px", fontSize: 13 }}
         >
           roomId 변경
         </button>
+
         <button
           onClick={() => nav("/view")}
           style={{ marginLeft: 8, padding: "6px 10px", fontSize: 13 }}
@@ -70,13 +82,12 @@ export default function Write() {
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-            // PC: Ctrl+Enter / Cmd+Enter 저장
             e.preventDefault();
             save();
           }
         }}
         onPaste={() => {
-          // 📱 모바일: 붙여넣기 하면 자동 저장
+          // 📱 모바일 붙여넣기 → 자동 저장
           setTimeout(() => save(), 0);
         }}
         rows={6}
@@ -111,7 +122,7 @@ export default function Write() {
         {status === "done" && <span>저장 완료 ✅</span>}
         {status === "error" && (
           <span style={{ color: "red" }}>
-            저장 실패 ❌ (콘솔/네트워크 확인)
+            저장 실패 ❌ (콘솔 / 네트워크 확인)
           </span>
         )}
       </div>
