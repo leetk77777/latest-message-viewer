@@ -12,12 +12,18 @@ function makeRandomRoomId() {
 
 export default function Room() {
   const nav = useNavigate();
-  const saved = useMemo(() => getRoomId(), []);
-  const [roomId, setRoom] = useState(saved);
+  const initial = useMemo(() => getRoomId(), []);
+  const [roomId, setRoom] = useState(initial);
+
+  // ✅ 저장 성공 여부 표시용
+  const [savedOk, setSavedOk] = useState(false);
 
   function save() {
     const v = roomId.trim();
-    if (!v) return;
+    if (!v) {
+      alert("roomId를 입력하세요.");
+      return;
+    }
 
     // 간단 검증(선택): 너무 짧으면 충돌 위험
     if (v.length < 6) {
@@ -26,12 +32,34 @@ export default function Room() {
     }
 
     setRoomId(v);
-    nav("/write");
+
+    // ✅ 저장 확인 메시지 표시
+    setSavedOk(true);
+
+    // ❗ 이전처럼 바로 이동하고 싶으면 아래 한 줄을 다시 살리면 됩니다.
+    // nav("/write");
   }
 
   function reset() {
     clearRoomId();
     setRoom("");
+    setSavedOk(false);
+  }
+
+  function goWrite() {
+    if (!getRoomId()) {
+      alert("roomId를 먼저 저장하세요.");
+      return;
+    }
+    nav("/write");
+  }
+
+  function goView() {
+    if (!getRoomId()) {
+      alert("roomId를 먼저 저장하세요.");
+      return;
+    }
+    nav("/view");
   }
 
   return (
@@ -46,7 +74,10 @@ export default function Room() {
       </label>
       <input
         value={roomId}
-        onChange={(e) => setRoom(e.target.value)}
+        onChange={(e) => {
+          setRoom(e.target.value);
+          setSavedOk(false); // ✅ 수정하면 다시 "저장 필요" 상태로
+        }}
         placeholder="예: room-abc123xyz789"
         style={{
           width: "100%",
@@ -69,11 +100,14 @@ export default function Room() {
             cursor: "pointer",
           }}
         >
-          저장하고 입력으로
+          저장
         </button>
 
         <button
-          onClick={() => setRoom(makeRandomRoomId())}
+          onClick={() => {
+            setRoom(makeRandomRoomId());
+            setSavedOk(false);
+          }}
           style={{
             padding: "12px 14px",
             fontSize: 14,
@@ -90,9 +124,53 @@ export default function Room() {
         현재 저장된 roomId: <b>{getRoomId() || "(없음)"}</b>
       </div>
 
+      {/* ✅ 저장 확인 메시지 + 이동 버튼 */}
+      {savedOk && (
+        <div
+          style={{
+            marginTop: 12,
+            padding: 12,
+            borderRadius: 10,
+            border: "1px solid #c8e6c9",
+            background: "#e8f5e9",
+            color: "#2e7d32",
+            fontSize: 14,
+            lineHeight: 1.5,
+          }}
+        >
+          roomId가 저장되었습니다 ✅
+          <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
+            <button
+              onClick={goWrite}
+              style={{
+                flex: 1,
+                padding: "10px 12px",
+                borderRadius: 10,
+                border: "1px solid #ccc",
+                cursor: "pointer",
+              }}
+            >
+              입력 화면으로
+            </button>
+            <button
+              onClick={goView}
+              style={{
+                flex: 1,
+                padding: "10px 12px",
+                borderRadius: 10,
+                border: "1px solid #ccc",
+                cursor: "pointer",
+              }}
+            >
+              보기 화면으로
+            </button>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <button
-          onClick={() => nav("/view")}
+          onClick={goView}
           style={{
             padding: "10px 12px",
             borderRadius: 10,
