@@ -60,7 +60,8 @@ export default function Room() {
       <h2 style={{ marginBottom: 8 }}>Room ID 설정</h2>
       <p style={{ opacity: 0.75, marginTop: 0, lineHeight: 1.5 }}>
         📌 목적: <b>휴대폰에서 저장</b> → <b>PC에서 보기</b><br />
-        따라서 <b>휴대폰/PC가 동일한 roomId</b>를 사용해야 합니다.
+        따라서 <b>휴대폰/PC가 동일한 roomId</b>를 사용해야 합니다.<br />
+        <b>roomId를 저장후 보기화면으로 이동</b>을 해야 합니다.
       </p>
 
       <label style={{ display: "block", marginBottom: 6, fontSize: 14 }}>roomId</label>
