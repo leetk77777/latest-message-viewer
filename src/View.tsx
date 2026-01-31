@@ -27,14 +27,14 @@ export default function View() {
 
   const fetchLatest = useCallback(async () => {
     try {
-      // ✅ OK 상태일 때는 굳이 loading으로 바꿔서 화면 깜빡이게 하지 않음
+      // ok일 때는 loading으로 바꿔 깜빡이게 하지 않음
       setStatus((prev) => (prev === "ok" ? "ok" : "loading"));
 
       const { data, error } = await supabase
         .from("messages")
         .select("room_id,text,created_at")
         .eq("room_id", roomId)
-        .maybeSingle(); // ✅ 없으면 data=null
+        .maybeSingle();
 
       if (error) {
         console.error("FETCH ERROR:", error);
@@ -56,12 +56,12 @@ export default function View() {
       return;
     }
 
-    // ✅ effect 본문에서 동기 setState를 피하기 위해 첫 호출을 콜백으로 감쌈
+    // ✅ effect 본문에서 동기 setState 경고 방지
     const first = window.setTimeout(() => {
       fetchLatest();
     }, 0);
 
-    const t = window.setInterval(fetchLatest, 20000); // ✅ 20초
+    const t = window.setInterval(fetchLatest, 20000);
 
     return () => {
       window.clearTimeout(first);
@@ -70,14 +70,7 @@ export default function View() {
   }, [roomId, nav, fetchLatest]);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: 24,
-      }}
-    >
+    <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
       <div style={{ maxWidth: 900, width: "100%" }}>
         <div style={{ fontSize: 14, opacity: 0.75, marginBottom: 8 }}>
           최신 메시지 (20초 갱신) / roomId: <b>{roomId}</b>{" "}
@@ -99,18 +92,14 @@ export default function View() {
             padding: 24,
             fontSize: 28,
             lineHeight: 1.4,
-
-            // ✅ 줄바꿈/공백 그대로 표시
-            whiteSpace: "pre-wrap",
+            whiteSpace: "pre-wrap",  // ✅ 줄바꿈/공백 그대로
             wordBreak: "break-word",
-
             minHeight: 120,
           }}
         >
           {status === "loading" && "불러오는 중..."}
           {status === "error" && "오류가 발생했습니다. 콘솔을 확인하세요."}
-          {status === "ok" &&
-            (msg ? msg.text : "아직 메시지가 없습니다. /write에서 입력하세요.")}
+          {status === "ok" && (msg ? msg.text : "아직 메시지가 없습니다. /write에서 입력하세요.")}
         </div>
 
         <div style={{ marginTop: 10, fontSize: 13, opacity: 0.7 }}>

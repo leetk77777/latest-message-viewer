@@ -13,16 +13,14 @@ export default function Write() {
   const roomId = useMemo(() => getRoomId(), []);
 
   const [text, setText] = useState("");
-  const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">(
-    "idle"
-  );
+  const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
 
   useEffect(() => {
     if (!roomId) nav("/room");
   }, [roomId, nav]);
 
   async function save() {
-    const message = text.trim();
+    const message = text.trim(); // ✅ 줄바꿈은 유지되고, 앞뒤 공백만 제거됨
     if (!message) return;
 
     try {
@@ -33,22 +31,18 @@ export default function Write() {
         .upsert(
           {
             room_id: roomId,
-            text: message, // ✅ DB 컬럼명과 일치
-            created_at: new Date().toISOString(), // ✅ 최신 저장 시각
+            text: message, // ✅ content -> text
+            created_at: new Date().toISOString(), // ✅ “최신 저장 시각”으로 갱신
           },
-          {
-            onConflict: "room_id", // ✅ room_id PK 기준 덮어쓰기
-          }
+          { onConflict: "room_id" }
         );
 
       if (error) throw error;
 
-      setText("");       // 입력창 비우기
+      setText("");
       setStatus("done");
-
-      // 원하면 자동으로 보기 화면 이동
+      // 원하면 저장 후 자동 이동:
       // nav("/view");
-
     } catch (e) {
       console.error("SAVE ERROR:", e);
       setStatus("error");
@@ -61,14 +55,12 @@ export default function Write() {
 
       <div style={{ fontSize: 14, opacity: 0.75, marginBottom: 14 }}>
         roomId: <b>{roomId}</b>
-
         <button
           onClick={() => nav("/room")}
           style={{ marginLeft: 10, padding: "6px 10px", fontSize: 13 }}
         >
           roomId 변경
         </button>
-
         <button
           onClick={() => nav("/view")}
           style={{ marginLeft: 8, padding: "6px 10px", fontSize: 13 }}
@@ -87,7 +79,6 @@ export default function Write() {
           }
         }}
         onPaste={() => {
-          // 📱 모바일 붙여넣기 → 자동 저장
           setTimeout(() => save(), 0);
         }}
         rows={6}
@@ -121,9 +112,7 @@ export default function Write() {
       <div style={{ marginTop: 12, minHeight: 22, fontSize: 14 }}>
         {status === "done" && <span>저장 완료 ✅</span>}
         {status === "error" && (
-          <span style={{ color: "red" }}>
-            저장 실패 ❌ (콘솔 / 네트워크 확인)
-          </span>
+          <span style={{ color: "red" }}>저장 실패 ❌ (콘솔/네트워크 확인)</span>
         )}
       </div>
 
