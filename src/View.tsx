@@ -82,8 +82,9 @@ export default function View() {
             padding: 24,
             fontSize: 28,
             lineHeight: 1.4,
+            whiteSpace: "pre-wrap",
             wordBreak: "break-word",
-            minHeight: 120,
+            minHeight: 120,            
           }}
         >
           {status === "loading" && "불러오는 중..."}
