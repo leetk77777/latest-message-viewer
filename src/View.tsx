@@ -105,7 +105,7 @@ export default function View() {
     >
       <div style={{ maxWidth: 900, width: "100%" }}>
         <div style={{ fontSize: 14, opacity: 0.75, marginBottom: 10 }}>
-          최신 메시지 (20초 갱신) / roomId: <b>{roomId}</b>{" "}
+          최신 메시지 / roomId: <b>{roomId}</b>{" "}
           <button onClick={() => nav("/room")} style={{ marginLeft: 8 }}>
             roomId 변경
           </button>
