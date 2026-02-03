@@ -89,12 +89,8 @@ export default function View() {
       return;
     }
 
-    fetchLatest();
-
-    const t = window.setInterval(fetchLatest, 20000); // ✅ 20초 갱신
-    return () => window.clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, fetchLatest]);
+    fetchLatest(); // 1회 로드
+  }, [roomId, fetchLatest, nav]);
 
   const hasText = !!msg?.text?.trim();
 
