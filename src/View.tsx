@@ -117,6 +117,24 @@ export default function View() {
             입력하기
           </button>
 
+          {/* 🔄 새로고침 버튼 */}
+          <button
+            onClick={fetchLatest}
+            disabled={status === "loading"}
+            style={{
+              marginLeft: 8,
+              padding: "6px 10px",
+              fontSize: 13,
+              borderRadius: 10,
+              border: "1px solid #ccc",
+              cursor: status === "loading" ? "not-allowed" : "pointer",
+              opacity: status === "loading" ? 0.6 : 1,
+            }}
+            title="즉시 새로고침"
+          >
+            {status === "loading" ? "새로고침 중..." : "새로고침"}
+          </button>
+
           {/* ✅ 복사 버튼 */}
           <button
             onClick={onCopy}
