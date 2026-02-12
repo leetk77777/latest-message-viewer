@@ -79,9 +79,6 @@ export default function Write() {
             save();
           }
         }}
-        onPaste={() => {
-          setTimeout(() => save(), 0);
-        }}
         rows={6}
         placeholder="메시지를 붙여넣으면 자동 저장됩니다"
         style={{
